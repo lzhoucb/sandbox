@@ -1,4 +1,5 @@
-import { printIndices } from "./utility";
+import { NotBlockElementError } from "./types";
+import { isBlock, printIndices } from "./utility";
 
 export interface TextNodeChunk {
   node: Text;
@@ -12,12 +13,12 @@ export interface TextChunk {
   text: string;
 }
 
-const endOfSentence = /[\.\?\!]\s+/;
+const textNodeBreakpoint = /[\.\?\!]\s+|(.|\n)$/; // Matches end-of-sentence punctuation or end of string
 
 export function getTextChunksFromTextNode(node: Text): TextChunk[] {
   let text: string = node.textContent;
   let offset: number = 0;
-  let end: number = text.search(endOfSentence);
+  let end: number = text.search(textNodeBreakpoint);
   const textChunks: TextChunk[] = [];
 
   while (end !== -1) {
@@ -35,40 +36,70 @@ export function getTextChunksFromTextNode(node: Text): TextChunk[] {
 
     offset += end + 1;
     text = text.substring(end + 1);
-    end = text.search(endOfSentence);
+    end = text.search(textNodeBreakpoint);
   }
 
-  const endChunk: TextNodeChunk = {
-    node: node,
-    start: offset,
-    end: offset + text.length - 1
-  }
+  // const endChunk: TextNodeChunk = {
+  //   node: node,
+  //   start: offset,
+  //   end: offset + text.length - 1
+  // }
 
-  textChunks.push({
-    chunk: endChunk,
-    text: text
-  });
+  // textChunks.push({
+  //   chunk: endChunk,
+  //   text: text
+  // });
   return textChunks;
 }
-// function getChunks(element: Element, visited: Set<Node>) {
-//   const tcToHC: Map<SpeechChunk, TextChunk> = new Map(); // text chunk -> highlight chunk
-//   const traversalStack: Node[] = [];
-//   const childNodes = element.childNodes;
+function pushChildren(node: Node, traversalStack: Node[]): void {
+  const childNodes = node.childNodes;
 
-//   for (let i = childNodes.length - 1; i >= 0; --i) {
-//     traversalStack.push(childNodes[i]);
-//   }
+  for (let i = childNodes.length - 1; i >= 0; --i) {
+    const child = childNodes[i];
 
-//   while (traversalStack.length > 0) {
-//     const node = traversalStack.pop();
+    if (child.nodeType === Node.TEXT_NODE || child.nodeType === Node.ELEMENT_NODE && !isBlock(child as Element)) {
+      traversalStack.push(childNodes[i]);
+    }
+  }
+}
 
-//     if (node.nodeType === Node.TEXT_NODE) {
-//       let text = node.textContent;
-//       let endOfSentence = text.search(/\s+/);
+export function getTextChunksFromBlockElement(element: Element): TextChunk[] {
+  if (!isBlock(element)) {
+    throw new NotBlockElementError(element);
+  }
 
-//       while (endOfSentence !== -1) {
-//       }
-//     }
-//   }
-// }
+  const traversalStack: Node[] = [];
+  pushChildren(element, traversalStack);
 
+  const textChunks: TextChunk[] = [];
+
+  while (traversalStack.length > 0) {
+    const node = traversalStack.pop();
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      textChunks.push(...(getTextChunksFromTextNode(node as Text)));
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      const element = node as Element;
+
+      if (element.matches(".mc-option>label")) {
+        textChunks.push({ chunk: element, text: element.getAttribute("aria-label") });
+      } else {
+        const tagName = element.tagName.toUpperCase();
+
+        if (tagName === "IMG" || tagName === "SVG") {
+          textChunks.push({ chunk: element, text: (element as HTMLImageElement).alt });
+        } else if (tagName === "MJX-CONTAINER") {
+          if (element.getAttribute("aria-label")) {
+            textChunks.push({ chunk: element, text: element.getAttribute("aria-label") });
+          } else if (element.getAttribute("alttext")) {
+            textChunks.push({ chunk: element, text: element.getAttribute("alttext") });
+          }
+        } else {
+          pushChildren(element, traversalStack);
+        }
+      }
+    }
+  }
+
+  return textChunks;
+}

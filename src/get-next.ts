@@ -1,4 +1,4 @@
-import { getTextChunksFromBlockElement } from "./get-text-chunks";
+import { getTextChunksFromBlockElement } from "./text-chunk";
 import { isBlock } from "./utility";
 
 function getNextBlockChild(cur: Element, visited: Set<Element>): Element {
