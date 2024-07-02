@@ -39,18 +39,9 @@ export function getTextChunksFromTextNode(node: Text): TextChunk[] {
     end = text.search(textNodeBreakpoint);
   }
 
-  // const endChunk: TextNodeChunk = {
-  //   node: node,
-  //   start: offset,
-  //   end: offset + text.length - 1
-  // }
-
-  // textChunks.push({
-  //   chunk: endChunk,
-  //   text: text
-  // });
   return textChunks;
 }
+
 function pushChildren(node: Node, traversalStack: Node[]): void {
   const childNodes = node.childNodes;
 

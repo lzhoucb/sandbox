@@ -7,14 +7,36 @@ interface Phrase {
   text: string
 }
 
-// export function getPhrasesFromBlockElement(element: Element): Phrase[] {
-//   if (!isBlock(element)) {
-//     throw new NotBlockElementError(element);
-//   }
+const phraseBreakpoint = /[\.\?\!]$/; // Matches end-of-string punctuation
 
-//   const textChunks = getTextChunksFromBlockElement(element);
+export function getPhrasesFromBlockElement(element: Element): Phrase[] {
+  if (!isBlock(element)) {
+    throw new NotBlockElementError(element);
+  }
 
-//   for (const textChunk of textChunks) {
+  const textChunks = getTextChunksFromBlockElement(element);
+  let phrase: Phrase = null;
+  const phrases: Phrase[] = [];
 
-//   }
-// }
+  for (let i = 0; i < textChunks.length; ++i) {
+    const textChunk = textChunks[i];
+
+    if (!phrase) {
+      phrase = { chunks: [], text: "" };
+    }
+
+    phrase.chunks.push(textChunk);
+    phrase.text += textChunk.text;
+
+    if (phraseBreakpoint.test(textChunk.text)) {
+      phrases.push(phrase);
+      phrase = null;
+    }
+  }
+
+  if (phrase) { // If there's any phrase remaining that doesn't end with punctuation, push that too
+    phrases.push(phrase);
+  }
+
+  return phrases;
+}
