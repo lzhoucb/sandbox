@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { printIndices } from "./utility";
 import { getTextChunksFromBlockElement } from "./text-chunk";
 import { getPhrasesFromBlockElement } from "./phrase";
+import { getPlaylist } from "./playlist";
 
 const synth = window.speechSynthesis;
 
@@ -12,6 +13,7 @@ function App() {
     console.log(target.childNodes);
     console.log(getTextChunksFromBlockElement(target));
     console.log(getPhrasesFromBlockElement(target));
+    console.log(getPlaylist(document.body));
   }, []);
 
   return (

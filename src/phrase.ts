@@ -2,7 +2,7 @@ import { getTextChunksFromBlockElement, TextChunk } from "./text-chunk";
 import { NotBlockElementError } from "./types";
 import { isBlock } from "./utility";
 
-interface Phrase {
+export interface Phrase {
   chunks: TextChunk[],
   text: string
 }
