@@ -1,11 +1,17 @@
 import { NotBlockElementError } from "./types";
-import { isBlock, printIndices } from "./utility";
+import { isBlock, printIndices, TTS_HIGHLIGHT_CLASS_NAME } from "./utility";
 
-export interface TextNodeChunk {
+export class TextNodeChunk {
   node: Text;
   // parent: Element;
   start: number;
   end: number;
+
+  constructor(node, start, end) {
+    this.node = node;
+    this.start = start;
+    this.end = end;
+  }
 }
 
 export interface TextChunk {
@@ -23,14 +29,8 @@ export function getTextChunksFromTextNode(node: Text): TextChunk[] {
 
   while (end !== -1) {
     const substring = text.substring(0, end + 1);
-    const textNodeChunk: TextNodeChunk = {
-      node: node,
-      // parent: target.parentElement,
-      start: offset,
-      end: offset + end
-    };
     textChunks.push({
-      chunk: textNodeChunk,
+      chunk: new TextNodeChunk(node, offset, offset + end),
       text: substring
     });
 
@@ -93,4 +93,27 @@ export function getTextChunksFromBlockElement(element: Element): TextChunk[] {
   }
 
   return textChunks;
+}
+
+export function highlightTextChunk(textChunk: TextChunk) {
+  console.log("highlighting");
+  const chunk = textChunk.chunk;
+  console.log(chunk);
+
+  if (chunk instanceof Element) {
+    chunk.classList.add(TTS_HIGHLIGHT_CLASS_NAME);
+    return;
+  }
+
+  if (chunk instanceof TextNodeChunk) {
+    console.log("bleh");
+    const start = chunk.node;
+    const middle = start.splitText(chunk.start);
+    const end = middle.splitText(chunk.end - chunk.start + 1);
+    const highlightSpan = document.createElement("span");
+    highlightSpan.classList.add(TTS_HIGHLIGHT_CLASS_NAME);
+    const parent = middle.parentNode;
+    parent.insertBefore(highlightSpan, middle);
+    highlightSpan.appendChild(parent.removeChild(middle));
+  }
 }

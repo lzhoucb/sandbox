@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
 import { printIndices } from "./utility";
-import { getTextChunksFromBlockElement } from "./text-chunk";
+import { getTextChunksFromBlockElement, highlightTextChunk } from "./text-chunk";
 import { getPhrasesFromBlockElement } from "./phrase";
 import { getPlaylist } from "./playlist";
 import { useWebSpeech } from "./use-web-speech";
+
+import "./App.css";
 
 const synth = window.speechSynthesis;
 
@@ -16,6 +18,9 @@ function App() {
 
   useEffect(() => {
     console.clear();
+    const target = document.getElementById("test");
+    const chunks = getTextChunksFromBlockElement(target);
+    highlightTextChunk(chunks[5]);
   }, []);
 
   return (

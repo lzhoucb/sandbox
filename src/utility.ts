@@ -1,3 +1,5 @@
+export const TTS_HIGHLIGHT_CLASS_NAME = "tts-highlight";
+
 export function printIndices(string: string) {
   let out = "";
 
@@ -15,6 +17,6 @@ export function printIndices(string: string) {
   console.log(out);
 }
 
-export function isBlock(element: Element): boolean{
+export function isBlock(element: Element): boolean {
   return window.getComputedStyle(element).display === "block";
 }
