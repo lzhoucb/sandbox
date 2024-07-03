@@ -3,22 +3,24 @@ import { printIndices } from "./utility";
 import { getTextChunksFromBlockElement } from "./text-chunk";
 import { getPhrasesFromBlockElement } from "./phrase";
 import { getPlaylist } from "./playlist";
+import { useWebSpeech } from "./use-web-speech";
 
 const synth = window.speechSynthesis;
 
 function App() {
+  const { play } = useWebSpeech();
+
+  function handlePlay() {
+    play(null);
+  }
+
   useEffect(() => {
     console.clear();
-    const target = document.getElementById("test");
-    console.log(target.childNodes);
-    console.log(getTextChunksFromBlockElement(target));
-    console.log(getPhrasesFromBlockElement(target));
-    console.log(getPlaylist(document.body));
   }, []);
 
   return (
     <>
-      <button>Play</button>
+      <button onClick={handlePlay}>Play</button>
       <p className="App" id="test">
         This is some <strong>strong and then <i>italicized</i> text.</strong><br />
         Here is another text node after a line break. It contains a sentence and then a phrase which doesn't end with punctuation

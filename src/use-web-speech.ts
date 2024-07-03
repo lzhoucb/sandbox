@@ -1,113 +1,117 @@
-// import { useRef, useState, useEffect, useCallback } from "react";
-// import { useAllowedVoices } from "./use-allowed-voices";
+import { useRef, useState, useEffect, useCallback } from "react";
+import { useAllowedVoices } from "./use-allowed-voices";
+import { Playlist, getPlaylist } from "./playlist";
 
-// export enum SpeechState {
-//   Stopped,
-//   Pending,
-//   Playing,
-//   Paused
-// }
+const ROOT_ELEMENT = document.body;
 
-// export const useWebSpeech = () => {
-//   const synth = window.speechSynthesis;
+export enum SpeechState {
+  Stopped,
+  Pending,
+  Playing,
+  Paused
+}
 
-//   const curRef = useRef<Element>(null);
-//   const visitedRef = useRef<Set<Element>>(new Set<Element>());
+export const useWebSpeech = () => {
+  const synth = window.speechSynthesis;
 
-//   const [speechState, setSpeechState] = useState<SpeechState>(SpeechState.Stopped);
-//   const [voice, setVoice] = useState<SpeechSynthesisVoice>(null);
-//   const [speed, setSpeed] = useState<number>(null);
-//   const [volume, setVolume] = useState<number>(null);
+  const playlistRef = useRef<Playlist>(null);
+  const playlistIndexRef = useRef<number>(null);
 
-//   const allowedVoices = useAllowedVoices();
+  const [speechState, setSpeechState] = useState<SpeechState>(SpeechState.Stopped);
+  const [voice, setVoice] = useState<SpeechSynthesisVoice>(null);
+  const [speed, setSpeed] = useState<number>(null);
+  const [volume, setVolume] = useState<number>(null);
 
-//   useEffect((): void => {
-//     if (allowedVoices.size > 0) {
-//       setVoice(allowedVoices.values().next().value);
-//     }
-//   }, [allowedVoices]);
+  const allowedVoices = useAllowedVoices();
 
-//   function handlePending() {
-//     const cur = curRef.current;
+  useEffect((): void => {
+    if (allowedVoices.size > 0) {
+      setVoice(allowedVoices.values().next().value);
+    }
+  }, [allowedVoices]);
 
-//     if (!cur) {
-//       setSpeechState(SpeechState.Stopped);
-//       return;
-//     }
+  function handlePending() {
+    const playlist = playlistRef.current;
 
-//     const visited = visitedRef.current;
-//     visited.add(cur);
-//     const utterance = new SpeechSynthesisUtterance(cur.text ?? " ");
+    if (!playlist) {
+      return;
+    }
 
-//     utterance.addEventListener("start", () => {
-//       setSpeechState(SpeechState.Playing);
-//       highlight(cur.associatedElement);
-//     });
+    const playlistIndex = playlistIndexRef.current;
 
-//     utterance.addEventListener("pause", () => {
-//       setSpeechState(SpeechState.Paused);
-//     });
+    if (playlistIndex === null || playlistIndex < 0 || playlistIndex >= playlist.length) {
+      setSpeechState(SpeechState.Stopped);
+      return;
+    }
 
-//     utterance.addEventListener("resume", () => {
-//       setSpeechState(SpeechState.Playing);
-//     });
+    const phrase = playlist[playlistIndex];
+    console.log(phrase);
+    const utterance = new SpeechSynthesisUtterance(phrase.text ?? " ");
 
-//     utterance.addEventListener("end", () => {
-//       setSpeechState(SpeechState.Pending);
-//       unhighlight(cur.associatedElement);
-//       curRef.current = getNext(cur, visited);
-//     });
+    utterance.addEventListener("start", () => {
+      setSpeechState(SpeechState.Playing);
+      // highlight(cur.associatedElement);
+    });
 
-//     utterance.voice = voice;
-//     utterance.volume = volume;
-//     utterance.rate = speed;
-//     synth.speak(utterance);
-//   }
+    utterance.addEventListener("pause", () => {
+      setSpeechState(SpeechState.Paused);
+    });
 
-//   useEffect(() => {
-//     if (speechState === SpeechState.Pending) {
-//       handlePending();
-//     }
-//   }, [speechState]);
+    utterance.addEventListener("resume", () => {
+      setSpeechState(SpeechState.Playing);
+    });
 
-//   const play = useCallback((start: Element) => {
-//     stop();
-//     curRef.current = new Track(start);
-//     setSpeechState(SpeechState.Pending);
-//   }, []);
+    utterance.addEventListener("end", () => {
+      setSpeechState(SpeechState.Pending);
+      ++playlistIndexRef.current;
+      // unhighlight(cur.associatedElement);
+      // curRef.current = getNext(cur, visited);
+    });
 
-//   const pause = useCallback(() => {
-//     synth.pause();
-//   }, []);
+    // utterance.voice = voice;
+    // utterance.volume = volume;
+    // utterance.rate = speed;
+    synth.speak(utterance);
+  }
 
-//   const resume = useCallback(() => {
-//     synth.resume();
-//   }, []);
+  useEffect(() => {
+    if (speechState === SpeechState.Pending) {
+      handlePending();
+    }
+  }, [speechState]);
 
-//   const stop = useCallback(() => {
-//     synth.cancel();
+  const play = useCallback((start: Element) => {
+    stop();
+    playlistRef.current = getPlaylist(ROOT_ELEMENT);
+    setSpeechState(SpeechState.Pending);
+  }, []);
 
-//     if (curRef.current) {
-//       unhighlight(curRef.current.associatedElement);
-//     }
+  const pause = useCallback(() => {
+    synth.pause();
+  }, []);
 
-//     curRef.current = null;
-//     visitedRef.current.clear();
-//     setSpeechState(SpeechState.Stopped);
-//   }, []);
+  const resume = useCallback(() => {
+    synth.resume();
+  }, []);
 
-//   return {
-//     speechState,
-//     voice,
-//     speed,
-//     volume,
-//     allowedVoices,
-//     setVoice,
-//     setSpeed,
-//     setVolume,
-//     play,
-//     pause,
-//     resume,
-//     stop
-//   };
-// };
+  const stop = useCallback(() => {
+    synth.cancel();
+    playlistIndexRef.current = 0;
+    setSpeechState(SpeechState.Stopped);
+  }, []);
+
+  return {
+    speechState,
+    voice,
+    speed,
+    volume,
+    allowedVoices,
+    setVoice,
+    setSpeed,
+    setVolume,
+    play,
+    pause,
+    resume,
+    stop
+  };
+};
