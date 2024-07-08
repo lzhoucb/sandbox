@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
-import { printIndices } from "./utility";
+import { END_OF_SENTENCE, getMatchIndexes, printIndices } from "./utility";
 
 import "./App.css";
-import { getEndsOfSentences } from "./get-speech-text";
+import { getPhrasesFromBlockElement } from "./get-speech-text";
 
 const synth = window.speechSynthesis;
 
@@ -12,7 +12,8 @@ function App() {
     const target = document.getElementById("test");
     console.log(target.textContent);
     printIndices(target.textContent);
-    console.log(getEndsOfSentences(target.textContent));
+    console.log(getMatchIndexes(target.textContent, END_OF_SENTENCE))
+    console.log(getPhrasesFromBlockElement(target))
   }, []);
 
   return (

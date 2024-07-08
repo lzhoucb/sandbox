@@ -1,78 +1,83 @@
-import { isBlock } from "./utility";
+import { END_OF_SENTENCE, getMatchIndexes, isBlock, isElement, isTextNode } from "./utility";
 import { NotBlockElementError } from "./types";
-
-const END_OF_SENTENCE = /[.!?]\s+|.$/
+import { getNodeText } from "./get-node-text";
 
 function pushChildren(node: Node, traversalStack: Node[]): void {
-  const childNodes = node.childNodes;
+  const children = node.childNodes;
 
-  for (let i = childNodes.length - 1; i >= 0; --i) {
-    const child = childNodes[i];
+  for (let i = children.length - 1; i >= 0; --i) {
+    const child = children[i];
 
-    if (child.nodeType === Node.TEXT_NODE || child.nodeType === Node.ELEMENT_NODE && !isBlock(child as Element)) {
-      traversalStack.push(childNodes[i]);
+    if (isTextNode(child) || isElement(child) && !isBlock(child as Element)) {
+      traversalStack.push(child);
     }
   }
 }
 
-export function getEndsOfSentences(string: string): number[] {
-  let searchString: string = string;
-  let end: number = searchString.search(END_OF_SENTENCE);
-  let offset = 0;
-  const ends: number[] = [];
+class TextNodeChunk {
+  node: Text;
+  start: number;
+  end: number;
 
-  while (end !== -1) {
-    ends.push(offset + end);
-    offset += end + 1;
-    searchString = searchString.substring(end + 1);
-    end = searchString.search(END_OF_SENTENCE);
+  constructor(node: Text, start: number, end: number) {
+    this.node = node;
+    this.start = start;
+    this.end = end;
   }
-
-  return ends;
 }
 
+type PhraseChunk = TextNodeChunk | Element;
+type Phrase = PhraseChunk[];
 
-function getSpeechTextFromBlockElement(element: Element) {
+export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then get speech text from phrases
   if (!isBlock(element)) {
-    return new NotBlockElementError(element);
+    throw new NotBlockElementError(element);
   }
 
   const traversalStack: Node[] = [];
   pushChildren(element, traversalStack);
-  let speechText = "";
+  let phraseBuffer: Phrase = [];
+  const phrases: Phrase[] = [];
+
+  function flushCurPhrase() {
+    if (phraseBuffer.length > 0) {
+      phrases.push(phraseBuffer);
+      phraseBuffer = [];
+    }
+  }
 
   while (traversalStack.length > 0) {
     const node = traversalStack.pop();
+    const nodeText = getNodeText(node);
 
-    if (node instanceof Text) {
-      const startsOfWords = getEndsOfSentences(node.textContent);
-
-      for (const startOfWord of startsOfWords) {
-
-      }
+    if (!nodeText) {
+      pushChildren(node, traversalStack);
+      continue;
     }
-    // if (node.nodeType === Node.TEXT_NODE) {
-    //   textChunks.push(...(getTextChunksFromTextNode(node as Text)));
-    // } else if (node.nodeType === Node.ELEMENT_NODE) {
-    //   const element = node as Element;
 
-    //   if (element.matches(".mc-option>label")) {
-    //     textChunks.push({ chunk: element, text: element.getAttribute("aria-label") });
-    //   } else {
-    //     const tagName = element.tagName.toUpperCase();
+    if (isTextNode(node)) {
+      const breakpoints = getMatchIndexes(nodeText, END_OF_SENTENCE);
+      let start = 0;
 
-    //     if (tagName === "IMG" || tagName === "SVG") {
-    //       textChunks.push({ chunk: element, text: (element as HTMLImageElement).alt });
-    //     } else if (tagName === "MJX-CONTAINER") {
-    //       if (element.getAttribute("aria-label")) {
-    //         textChunks.push({ chunk: element, text: element.getAttribute("aria-label") });
-    //       } else if (element.getAttribute("alttext")) {
-    //         textChunks.push({ chunk: element, text: element.getAttribute("alttext") });
-    //       }
-    //     } else {
-    //       pushChildren(element, traversalStack);
-    //     }
-    //   }
-    // }
+      for (const breakpoint of breakpoints) {
+        phraseBuffer.push(new TextNodeChunk(node as Text, start, breakpoint));
+        flushCurPhrase();
+        start = breakpoint + 1;
+      }
+
+      if (start < nodeText.length) {
+        phraseBuffer.push(new TextNodeChunk(node as Text, start, nodeText.length - 1))
+      }
+
+      continue;
+    }
+
+    if (isElement(node)) {
+      flushCurPhrase();
+      phrases.push([node as Element])
+    }
   }
+
+  flushCurPhrase();
+  return phrases;
 }
