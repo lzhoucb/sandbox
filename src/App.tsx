@@ -12,7 +12,6 @@ function App() {
     const target = document.getElementById("test");
     console.log(target.textContent);
     printIndices(target.textContent);
-    console.log(getMatchIndexes(target.textContent, END_OF_SENTENCE))
     console.log(getPhrasesFromBlockElement(target))
   }, []);
 

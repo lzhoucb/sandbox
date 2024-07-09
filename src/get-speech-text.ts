@@ -39,7 +39,7 @@ export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then
   let phraseBuffer: Phrase = [];
   const phrases: Phrase[] = [];
 
-  function flushCurPhrase() {
+  function flushPhraseBuffer() {
     if (phraseBuffer.length > 0) {
       phrases.push(phraseBuffer);
       phraseBuffer = [];
@@ -61,7 +61,7 @@ export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then
 
       for (const breakpoint of breakpoints) {
         phraseBuffer.push(new TextNodeChunk(node as Text, start, breakpoint));
-        flushCurPhrase();
+        flushPhraseBuffer();
         start = breakpoint + 1;
       }
 
@@ -73,11 +73,25 @@ export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then
     }
 
     if (isElement(node)) {
-      flushCurPhrase();
-      phrases.push([node as Element])
+      flushPhraseBuffer();
+      phrases.push([node as Element]);
+      flushPhraseBuffer();
     }
   }
 
-  flushCurPhrase();
+  flushPhraseBuffer();
   return phrases;
+}
+
+export function getSpeechTextFromPhrases(phrases: Phrase[]) {
+  let speechText: string = "";
+  const indexToPhrase: Map<number, Phrase> = new Map<number, Phrase>();
+
+  for (const phrase of phrases) {
+    indexToPhrase.set(speechText.length, phrase);
+
+    for (const phraseChunk of phrase) {
+      // This will recalculate speech text from elements; instead store the calculated speech text?
+    }
+  }
 }
