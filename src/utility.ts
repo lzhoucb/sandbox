@@ -32,17 +32,8 @@ export function isElement(node: Node): boolean {
 }
 
 export function getMatchIndexes(string: string, regex: RegExp): number[] {
-  // let searchString: string = string;
-  // let offset = 0;
-  // let index = searchString.search(regex);
   const indexes: number[] = [];
 
-  // while (index !== -1) {
-  //   indexes.push(offset + index);
-  //   searchString = searchString.substring(index + 1);
-  //   offset += index + 1;
-  //   index = searchString.search(regex);
-  // }
   for (let match = regex.exec(string); match !== null; match = regex.exec(string)) {
     indexes.push(match.index);
   }

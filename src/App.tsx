@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { ENDS_OF_SENTENCES, getMatchIndexes, printIndices, STARTS_OF_SENTENCES } from "./utility";
+import { getPhrasesFromBlockElement, getSpeechTextFromPhrases } from "./get-speech-text";
 
 import "./App.css";
-import { getPhrasesFromBlockElement, getSpeechTextFromPhrases } from "./get-speech-text";
 
 
 function App() {
@@ -27,30 +27,12 @@ function App() {
     synth.speak(utterance);
   }
 
-  // const setVoiceToDefault = useCallback(() => {
-  //   const voices = synthRef.current.getVoices();
-
-  //   for (const voice of voices) {
-  //     if (voice.default) {
-  //       setVoice(voice);
-  //     }
-  //   }
-  // }, [])
-
-  // useEffect(() => {
-  //   setVoiceToDefault();
-  //   synthRef.current.addEventListener("voiceschanged", setVoiceToDefault);
-
-  //   return () => {
-  //     synthRef.current.removeEventListener("voiceschanged", setVoiceToDefault);
-  //   }
-  // }, [])
-
   return (
     <>
       <button onClick={handlePlay}>Play</button>
       <p className="App" id="test">
-        Sentence one. Sentence two! Sentence three? Phrase one
+        Sentence one. Sentence two! Sentence three? Phrase one followed by a line break<br />
+        Sentence four. Phrase two
       </p>
       <img
         src="https://upload.wikimedia.org/wikipedia/commons/1/1a/John_Singer_Sargent_-_A_Parisian_Beggar_Girl.jpg"
