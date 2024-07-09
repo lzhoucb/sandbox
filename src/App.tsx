@@ -1,23 +1,54 @@
-import React, { useEffect } from "react";
-import { END_OF_SENTENCE, getMatchIndexes, printIndices } from "./utility";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ENDS_OF_SENTENCES, getMatchIndexes, printIndices, STARTS_OF_SENTENCES } from "./utility";
 
 import "./App.css";
-import { getPhrasesFromBlockElement } from "./get-speech-text";
+import { getPhrasesFromBlockElement, getSpeechTextFromPhrases } from "./get-speech-text";
 
-const synth = window.speechSynthesis;
 
 function App() {
+  const synth = window.speechSynthesis;
+
   useEffect(() => {
     console.clear();
-    const target = document.getElementById("test");
-    console.log(target.textContent);
-    printIndices(target.textContent);
-    console.log(getPhrasesFromBlockElement(target))
   }, []);
+
+  function handlePlay() {
+    const target = document.getElementById("test");
+    const phrases = getPhrasesFromBlockElement(target);
+    const speechText = getSpeechTextFromPhrases(phrases);
+    const utterance = new SpeechSynthesisUtterance(speechText.text);
+
+    utterance.addEventListener("boundary", event => {
+      console.log(event.charIndex);
+      console.log(speechText.indexToPhrase.get(event.charIndex));
+    });
+
+    synth.cancel();
+    synth.speak(utterance);
+  }
+
+  // const setVoiceToDefault = useCallback(() => {
+  //   const voices = synthRef.current.getVoices();
+
+  //   for (const voice of voices) {
+  //     if (voice.default) {
+  //       setVoice(voice);
+  //     }
+  //   }
+  // }, [])
+
+  // useEffect(() => {
+  //   setVoiceToDefault();
+  //   synthRef.current.addEventListener("voiceschanged", setVoiceToDefault);
+
+  //   return () => {
+  //     synthRef.current.removeEventListener("voiceschanged", setVoiceToDefault);
+  //   }
+  // }, [])
 
   return (
     <>
-      {/* <button onClick={handlePlay}>Play</button> */}
+      <button onClick={handlePlay}>Play</button>
       <p className="App" id="test">
         Sentence one. Sentence two! Sentence three? Phrase one
       </p>

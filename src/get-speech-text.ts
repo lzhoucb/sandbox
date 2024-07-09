@@ -1,18 +1,6 @@
-import { END_OF_SENTENCE, getMatchIndexes, isBlock, isElement, isTextNode } from "./utility";
+import { ENDS_OF_SENTENCES, getMatchIndexes, isBlock, isElement, isTextNode, STARTS_OF_SENTENCES } from "./utility";
 import { NotBlockElementError } from "./types";
 import { getNodeText } from "./get-node-text";
-
-function pushChildren(node: Node, traversalStack: Node[]): void {
-  const children = node.childNodes;
-
-  for (let i = children.length - 1; i >= 0; --i) {
-    const child = children[i];
-
-    if (isTextNode(child) || isElement(child) && !isBlock(child as Element)) {
-      traversalStack.push(child);
-    }
-  }
-}
 
 class TextNodeChunk {
   node: Text;
@@ -27,7 +15,21 @@ class TextNodeChunk {
 }
 
 type PhraseChunk = TextNodeChunk | Element;
-type Phrase = PhraseChunk[];
+
+class Phrase {
+  text: string;
+  chunks: PhraseChunk[];
+
+  constructor() {
+    this.text = "";
+    this.chunks = [];
+  }
+}
+
+interface SpeechText {
+  text: string;
+  indexToPhrase: Map<number, Phrase>;
+}
 
 export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then get speech text from phrases
   if (!isBlock(element)) {
@@ -35,14 +37,27 @@ export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then
   }
 
   const traversalStack: Node[] = [];
-  pushChildren(element, traversalStack);
-  let phraseBuffer: Phrase = [];
+
+  function pushChildren(node: Node): void {
+    const children = node.childNodes;
+
+    for (let i = children.length - 1; i >= 0; --i) {
+      const child = children[i];
+
+      if (isTextNode(child) || isElement(child) && !isBlock(child as Element)) {
+        traversalStack.push(child);
+      }
+    }
+  }
+
+  pushChildren(element);
+  let phraseBuffer: Phrase = new Phrase();
   const phrases: Phrase[] = [];
 
   function flushPhraseBuffer() {
-    if (phraseBuffer.length > 0) {
+    if (phraseBuffer.text !== "" && phraseBuffer.chunks.length > 0) {
       phrases.push(phraseBuffer);
-      phraseBuffer = [];
+      phraseBuffer = new Phrase();
     }
   }
 
@@ -51,22 +66,24 @@ export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then
     const nodeText = getNodeText(node);
 
     if (!nodeText) {
-      pushChildren(node, traversalStack);
+      pushChildren(node);
       continue;
     }
 
     if (isTextNode(node)) {
-      const breakpoints = getMatchIndexes(nodeText, END_OF_SENTENCE);
+      const breakpoints = getMatchIndexes(nodeText, ENDS_OF_SENTENCES);
       let start = 0;
 
       for (const breakpoint of breakpoints) {
-        phraseBuffer.push(new TextNodeChunk(node as Text, start, breakpoint));
+        phraseBuffer.text += nodeText.substring(start, breakpoint + 1);
+        phraseBuffer.chunks.push(new TextNodeChunk(node as Text, start, breakpoint));
         flushPhraseBuffer();
         start = breakpoint + 1;
       }
 
       if (start < nodeText.length) {
-        phraseBuffer.push(new TextNodeChunk(node as Text, start, nodeText.length - 1))
+        phraseBuffer.text += nodeText.substring(start);
+        phraseBuffer.chunks.push(new TextNodeChunk(node as Text, start, nodeText.length - 1))
       }
 
       continue;
@@ -74,7 +91,8 @@ export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then
 
     if (isElement(node)) {
       flushPhraseBuffer();
-      phrases.push([node as Element]);
+      phraseBuffer.text = nodeText;
+      phraseBuffer.chunks = [node as Element];
       flushPhraseBuffer();
     }
   }
@@ -83,15 +101,14 @@ export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then
   return phrases;
 }
 
-export function getSpeechTextFromPhrases(phrases: Phrase[]) {
-  let speechText: string = "";
+export function getSpeechTextFromPhrases(phrases: Phrase[]): SpeechText {
+  let text: string = "";
   const indexToPhrase: Map<number, Phrase> = new Map<number, Phrase>();
 
   for (const phrase of phrases) {
-    indexToPhrase.set(speechText.length, phrase);
-
-    for (const phraseChunk of phrase) {
-      // This will recalculate speech text from elements; instead store the calculated speech text?
-    }
+    indexToPhrase.set(text.length, phrase);
+    text += phrase.text;
   }
+
+  return { text, indexToPhrase };
 }
