@@ -2,21 +2,22 @@ import { ENDS_OF_SENTENCES, getMatchIndexes, isBlock, isElement, isTextNode, STA
 import { NotBlockElementError } from "./types";
 import { getNodeText } from "./get-node-text";
 
-class TextNodeChunk {
-  node: Text;
+export class TextNodeChunk {
+  originalNode: Text;
+  highlightedNode: Text = null;
   start: number;
   end: number;
 
-  constructor(node: Text, start: number, end: number) {
-    this.node = node;
+  constructor(originalNode: Text, start: number, end: number) {
+    this.originalNode = originalNode;
     this.start = start;
     this.end = end;
   }
 }
 
-type PhraseChunk = TextNodeChunk | Element;
+export type PhraseChunk = TextNodeChunk | Element;
 
-class Phrase {
+export class Phrase {
   text: string;
   chunks: PhraseChunk[];
 
@@ -64,6 +65,11 @@ export function getPhrasesFromBlockElement(element: Element): Phrase[] { // Then
   while (traversalStack.length > 0) {
     const node = traversalStack.pop();
     const nodeText = getNodeText(node);
+
+    if (isElement(node) && (node as Element).tagName.toUpperCase() === "BR") {
+      flushPhraseBuffer();
+      continue;
+    }
 
     if (!nodeText) {
       pushChildren(node);
