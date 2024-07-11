@@ -1,4 +1,4 @@
-import { ENDS_OF_SENTENCES, getMatchIndexes, isBlock, isElement, isTextNode, STARTS_OF_SENTENCES } from "./utility";
+import { ENDS_OF_SENTENCES, endsWithPunctuation, getMatchIndexes, isBlock, isElement, isTextNode, STARTS_OF_SENTENCES } from "./utility";
 import { NotBlockElementError } from "./types";
 import { getNodeText } from "./get-node-text";
 
@@ -113,7 +113,7 @@ export function getSpeechTextFromPhrases(phrases: Phrase[]): SpeechText {
 
   for (const phrase of phrases) {
     indexToPhrase.set(text.length, phrase);
-    text += phrase.text;
+    text += phrase.text + (endsWithPunctuation(phrase.text) ? " " : ". ");
   }
 
   return { text, indexToPhrase };

@@ -7,7 +7,7 @@ export function highlightTextNodeChunk(chunk: TextNodeChunk): void {
 
   if (chunk.start > 0) {
     chunk.highlightedNode = chunk.originalNode.splitText(chunk.start);
-  }
+  } // originalNode is always the head, even after splitText
 
   if (chunk.end - chunk.start + 1 < chunk.highlightedNode.textContent.length) {
     chunk.highlightedNode.splitText(chunk.end - chunk.start + 1);
@@ -16,8 +16,8 @@ export function highlightTextNodeChunk(chunk: TextNodeChunk): void {
   const highlightSpan = document.createElement("span");
   highlightSpan.classList.add("tts-highlight");
   let parent: Node = chunk.originalNode.parentNode;
-  parent.replaceChild(highlightSpan, chunk.originalNode);
-  highlightSpan.appendChild(chunk.originalNode);
+  parent.replaceChild(highlightSpan, chunk.highlightedNode);
+  highlightSpan.appendChild(chunk.highlightedNode);
 }
 
 export function highlightPhraseChunk(chunk: PhraseChunk): void {
@@ -34,10 +34,16 @@ export function highlightPhrase(phrase: Phrase) {
   }
 }
 
+function isHighlightSpan(element: Element) {
+  return element
+    && element.tagName.toUpperCase() === "SPAN"
+    && element.classList.contains("tts-highlight");
+}
+
 export function unhighlightTextNodeChunk(chunk: TextNodeChunk): void {
   const highlightSpan = chunk.highlightedNode.parentElement;
 
-  if (highlightSpan.tagName.toUpperCase() !== "SPAN" || !highlightSpan.classList.contains("tts-highlight")) {
+  if (!isHighlightSpan(highlightSpan)) {
     throw new NotHighlightSpanError(highlightSpan);
   }
 
@@ -45,21 +51,10 @@ export function unhighlightTextNodeChunk(chunk: TextNodeChunk): void {
   parent.insertBefore(chunk.highlightedNode, highlightSpan);
   parent.removeChild(highlightSpan);
 
-  // if (chunk.originalNode.previousSibling && isTextNode(chunk.originalNode.previousSibling)) {
-  //   parent.removeChild(chunk.originalNode.previousSibling);
-  // }
-
-  // if (chunk.originalNode.nextSibling && isTextNode(chunk.originalNode.nextSibling)) {
-  //   parent.removeChild(chunk.originalNode.nextSibling);
-  // }
-
   while (chunk.originalNode.nextSibling && isTextNode(chunk.originalNode.nextSibling)) {
     chunk.originalNode.textContent += chunk.originalNode.nextSibling.textContent;
     parent.removeChild(chunk.originalNode.nextSibling);
-  }
-
-  // chunk.originalNode.textContent = chunk.originalText;
-  // chunk.originalText = null;
+  } // Recall that originalNode is always the head. We can leverage this to recombine text after unhighlighting
 }
 
 export function unhighlightPhraseChunk(chunk: PhraseChunk): void {

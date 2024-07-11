@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ENDS_OF_SENTENCES, getMatchIndexes, printIndices, STARTS_OF_SENTENCES } from "./utility";
+import { ENDS_OF_SENTENCES, endsWithPunctuation, getMatchIndexes, printIndices, STARTS_OF_SENTENCES } from "./utility";
 import { getPhrasesFromBlockElement, getSpeechTextFromPhrases, Phrase, TextNodeChunk } from "./get-speech-text";
 
 import "./App.css";
@@ -18,30 +18,28 @@ function App() {
   }, []);
 
   function handlePlay() {
-    // const target = document.getElementById("test");
-    // printIndices(target.textContent);
-    // const phrases = getPhrasesFromBlockElement(target);
-    // const speechText = getSpeechTextFromPhrases(phrases);
-    // const utterance = new SpeechSynthesisUtterance(speechText.text);
-    // utterance.rate = 0.25;
+    const target = document.getElementById("test");
+    const phrases = getPhrasesFromBlockElement(target);
+    const speechText = getSpeechTextFromPhrases(phrases);
+    const utterance = new SpeechSynthesisUtterance(speechText.text);
 
-    // utterance.addEventListener("boundary", event => {
-    //   const curPhrase = speechText.indexToPhrase.get(event.charIndex);
+    utterance.addEventListener("boundary", event => {
+      const curPhrase = speechText.indexToPhrase.get(event.charIndex);
 
-    //   if (curPhrase) {
-    //     const prevPhrase = prevPhraseRef.current;
+      if (curPhrase) {
+        const prevPhrase = prevPhraseRef.current;
 
-    //     if (prevPhrase) {
-    //       unhighlightPhrase(prevPhrase);
-    //     }
+        if (prevPhrase) {
+          unhighlightPhrase(prevPhrase);
+        }
 
-    //     prevPhraseRef.current = curPhrase;
-    //     highlightPhrase(curPhrase);
-    //   }
-    // });
+        prevPhraseRef.current = curPhrase;
+        highlightPhrase(curPhrase);
+      }
+    });
 
-    // synth.cancel();
-    // synth.speak(utterance);
+    synth.cancel();
+    synth.speak(utterance);
   }
 
   return (
@@ -53,8 +51,9 @@ function App() {
         Sentence five, which has high<span className="highlight">lighting starting and end</span>ing in the middle of a word. Phrase two
       </p>
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/1/1a/John_Singer_Sargent_-_A_Parisian_Beggar_Girl.jpg"
-        alt="A Parisian Beggar Girl, by John Singer Sargent."
+        src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Starry_Night_by_Jean-Fran%C3%A7ois_Millet.jpeg"
+        alt="Starry Night by Jean-Francois Millet."
+        width="400px"
       />
     </>
   );

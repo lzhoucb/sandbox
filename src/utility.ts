@@ -40,3 +40,11 @@ export function getMatchIndexes(string: string, regex: RegExp): number[] {
 
   return indexes;
 }
+
+export function endsWithPunctuation(string: string) {
+  if (!string) {
+    return false;
+  }
+
+  return /[.!?]\s*$/.test(string);
+}
