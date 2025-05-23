@@ -1,62 +1,121 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { ENDS_OF_SENTENCES, endsWithPunctuation, getMatchIndexes, printIndices, STARTS_OF_SENTENCES } from "./utility";
-import { getPhrasesFromBlockElement, getSpeechTextFromPhrases, Phrase, TextNodeChunk } from "./get-speech-text";
-
+import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
-import { highlightPhrase, highlightPhraseChunk, highlightTextNodeChunk, unhighlightPhrase, unhighlightPhraseChunk } from "./highlight";
 
-
-function App() {
-  const synth = window.speechSynthesis;
-  const prevPhraseRef = useRef<Phrase>(null);
+const App = () => {
+  const [semanticTNCHighlights, setSemanticTNCHighlights] = useState<TextNodeChunkHighlight[]>([]);
+  useMutatingHighlights(semanticTNCHighlights);
 
   useEffect(() => {
-    console.clear();
-    const target = document.getElementById("test");
-    const phrases = getPhrasesFromBlockElement(target);
-    console.log(phrases);
-  }, []);
+    const text = document.getElementById("test").childNodes[0];
+    setSemanticTNCHighlights([
+      new TextNodeChunkHighlight(new TextNodeChunk(text as Text, 4, 16), "tts-highlight"),
+      new TextNodeChunkHighlight(new TextNodeChunk(text as Text, 4, 8), "tts-highlight-2")
+    ])
+  }, [])
 
-  function handlePlay() {
-    const target = document.getElementById("test");
-    const phrases = getPhrasesFromBlockElement(target);
-    const speechText = getSpeechTextFromPhrases(phrases);
-    const utterance = new SpeechSynthesisUtterance(speechText.text);
+  return <p id="test">
+    The quick brown fox jumps over the lazy dog.
+  </p>
+}
 
-    utterance.addEventListener("boundary", event => {
-      const curPhrase = speechText.indexToPhrase.get(event.charIndex);
+class TextNodeChunk {
+  node: Text;
+  start: number;
+  end: number;
 
-      if (curPhrase) {
-        const prevPhrase = prevPhraseRef.current;
+  constructor(node: Text, start: number, end: number) {
+    this.node = node;
+    this.start = start;
+    this.end = end;
+  }
+}
 
-        if (prevPhrase) {
-          unhighlightPhrase(prevPhrase);
-        }
+class TextNodeChunkHighlight {
+  chunk: TextNodeChunk;
+  className: string;
 
-        prevPhraseRef.current = curPhrase;
-        highlightPhrase(curPhrase);
-      }
-    });
+  constructor(chunk: TextNodeChunk, className: string) {
+    this.chunk = chunk;
+    this.className = className;
+  }
+}
 
-    synth.cancel();
-    synth.speak(utterance);
+const useMutatingHighlights = (tncHighlights: TextNodeChunkHighlight[]) => {
+  const originalTNToHighlightNodesRef = useRef(new Map<Text, ChildNode[]>());
+
+  useEffect(() => {
+    restoreOriginalTextNodes();
+    const originalTNToClassNames = getOriginalTNToClassNames(tncHighlights);
+
+    for (const [node, classNames] of originalTNToClassNames) {
+      originalTNToHighlightNodesRef.current.set(node, getHighlightNodes(node, classNames));
+    }
+
+    for (const [originalNode, highlightNodes] of originalTNToHighlightNodesRef.current) {
+      for (const highlightNode of highlightNodes) originalNode.before(highlightNode);
+      originalNode.remove();
+    }
+  }, [tncHighlights])
+
+  function restoreOriginalTextNodes() {
+    for (const [originalNode, highlightNodes] of originalTNToHighlightNodesRef.current) {
+      if (highlightNodes.length === 0) continue;
+      highlightNodes[0].before(originalNode);
+      for (const highlightNode of highlightNodes) highlightNode.remove();
+    }
+
+    originalTNToHighlightNodesRef.current.clear();
   }
 
-  return (
-    <>
-      <button onClick={handlePlay}>Play</button>
-      <p className="App" id="test">
-        Sentence one. Sentence two! Sentence three? Phrase one followed by a line break<br />
-        Sentence four, which has <strong>strong and then <i>italicized</i> text.</strong><br />
-        Sentence five, which has high<span className="highlight">lighting starting and end</span>ing in the middle of a word. Phrase two
-      </p>
-      <img
-        src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Starry_Night_by_Jean-Fran%C3%A7ois_Millet.jpeg"
-        alt="Starry Night by Jean-Francois Millet."
-        width="400px"
-      />
-    </>
-  );
+  function getOriginalTNToClassNames(semanticTNCHighlights: TextNodeChunkHighlight[]) {
+    const originalTNToClassNames = new Map<Text, string[]>();
+
+    for (const highlight of semanticTNCHighlights) {
+      const chunk = highlight.chunk;
+      const node = chunk.node;
+
+      if (!originalTNToClassNames.has(node)) {
+        originalTNToClassNames.set(node, new Array(node.textContent.length).fill(null));
+      }
+
+      const classNameIndexes = originalTNToClassNames.get(node);
+      const className = highlight.className;
+
+      for (let i = chunk.start; i < chunk.end; ++i) {
+        classNameIndexes[i] = className;
+      }
+    }
+
+    return originalTNToClassNames;
+  }
+
+  function getHighlightNodes(original: Text, classNames: string[]) {
+    let left = 0, right = 0;
+    let curClassName = classNames[right];
+    const highlightNodes: ChildNode[] = [];
+    const originalText = original.textContent;
+
+    while (left < classNames.length) {
+      ++right;
+
+      if (right === classNames.length || classNames[right] !== curClassName) {
+        if (curClassName === null) {
+          highlightNodes.push(new Text(originalText.substring(left, right)));
+        } else {
+          const span = document.createElement("span");
+          span.classList.add(curClassName);
+          span.append(new Text(originalText.substring(left, right)));
+          highlightNodes.push(span);
+        }
+
+        if (right < classNames.length) curClassName = classNames[right];
+        left = right;
+      }
+    }
+
+    return highlightNodes;
+  }
 }
+
 
 export default App;
