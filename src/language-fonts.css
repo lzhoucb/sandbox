@@ -7,7 +7,7 @@
   padding: 16px;
 }
 
-.lang-radio {
+.radio-group {
   padding-bottom: 16px;
 }
 
@@ -22,5 +22,5 @@ input[type="radio"] {
 #trad-chinese,
 #simp-chinese {
   display: inline-block;
-  padding-right: 16px;
+  padding-right: 32px;
 }
