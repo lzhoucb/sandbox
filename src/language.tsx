@@ -13,22 +13,24 @@ export const LanguageFonts = () => {
     <div className="lang-container">
       <div className="radio-group">
         <p>lang</p>
-        {/* <Radio value="" label="None (empty string)" name="lang" id="lang-none" curValue={lang} setValue={setLang} />
-        <br />
-        <Radio value="zh" label="zh" name="lang" id="lang-zh" curValue={lang} setValue={setLang} /> */}
         <RadioGroup
           name="lang"
           curValue={lang}
           setValue={setLang}
           table={[
             {value: "", label: "None (empty string)", idSuffix: "none"},
-            {value: "zh", label: "zh", idSuffix: "zh"}
+            {value: "zh", label: "zh (Chinese)", idSuffix: "zh"},
+            {value: "zh-CN", label: "zh-CN (Chinese, China)", idSuffix: "zh-cn"},
+            {value: "zh-HK", label: "zh-HK (Chinese, Hong Kong)", idSuffix: "zh-hk"},
+            {value: "zh-MO", label: "zh-MO (Chinese, Macao)", idSuffix: "zh-mo"},
+            {value: "zh-SG", label: "zh-SG (Chinese, Singapore)", idSuffix: "zh-sg"},
+            {value: "zh-TW", label: "zh-TW (Chinese, Taiwan)", idSuffix: "zh-tw"}
           ]}
         />
       </div>
       <div className="radio-group">
         <p>font</p>
-        <Radio value="Times" label="Times" name="font" id="font-times" curValue={font} setValue={setFont}/>
+        {/* <Radio value="Times" label="Times" name="font" id="font-times" curValue={font} setValue={setFont}/>
         <br/>
         <Radio value="Songti SC" label="Songti SC" name="font" id="font-songti-sc" curValue={font} setValue={setFont}/>
         <br/>
@@ -36,7 +38,19 @@ export const LanguageFonts = () => {
         <br/>
         <Radio value="PingFang SC" label="PingFang SC" name="font" id="font-pingfang-sc" curValue={font} setValue={setFont}/>
         <br/>
-        <Radio value="PingFang TC" label="PingFang TC" name="font" id="font-pingfang-tc" curValue={font} setValue={setFont}/>
+        <Radio value="PingFang TC" label="PingFang TC" name="font" id="font-pingfang-tc" curValue={font} setValue={setFont}/> */}
+        <RadioGroup
+          name="font"
+          curValue={font}
+          setValue={setFont}
+          table={[
+            {value: "Times", label: "Times", idSuffix: "times"},
+            {value: "Songti SC", label: "Songti SC", idSuffix: "songti-sc"},
+            {value: "Songti TC", label: "Songti TC", idSuffix: "songti-tc"},
+            {value: "PingFang SC", label: "PingFang SC", idSuffix: "pingfang-sc"},
+            {value: "PingFang TC", label: "PingFang TC", idSuffix: "pingfang-tc"}
+          ]}
+        />
       </div>
       <div id="chinese" lang={lang} style={{fontFamily: font}}>
         <div id="trad-chinese">
