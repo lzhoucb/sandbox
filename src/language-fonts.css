@@ -1,0 +1,26 @@
+:root * {
+  margin: 0px;
+  padding: 0px;
+}
+
+.lang-container {
+  padding: 16px;
+}
+
+.lang-radio {
+  padding-bottom: 16px;
+}
+
+input[type="radio"] {
+  margin-right: 16px;
+}
+
+#chinese {
+  font-size: 32px;
+}
+
+#trad-chinese,
+#simp-chinese {
+  display: inline-block;
+  padding-right: 16px;
+}
