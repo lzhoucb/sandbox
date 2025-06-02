@@ -1,9 +1,10 @@
 :root * {
   margin: 0px;
   padding: 0px;
+  font-size: 16px;
 }
 
-.lang-container {
+html{
   padding: 16px;
 }
 
@@ -15,12 +16,15 @@ input[type="radio"] {
   margin-right: 16px;
 }
 
-#chinese {
+#chinese *,
+#japanese * {
   font-size: 32px;
 }
 
 #trad-chinese,
-#simp-chinese {
+#simp-chinese,
+#kanji,
+#hiragana {
   display: inline-block;
   padding-right: 32px;
 }

@@ -1,9 +1,8 @@
 import React from "react";
 import "./App.css";
-import { LanguageFonts } from "./language";
+import Language from "./languages/language";
 
-const App = () => 
-  <LanguageFonts/>
+const App = () => <Language/>
 
 
 export default App;
