@@ -27,6 +27,14 @@ const fontTableAppleJa = [
   { value: "YuMincho", label: "YuMincho", idSuffix: "yumincho" }
 ];
 
+const fontTableWindowsJa = [
+  ...fontTableUniversal,
+  { value: "MS Gothic", label: "MS Gothic (Gothic = sans-serif)", idSuffix: "ms-gothic" },
+  { value: "MS PGothic", label: "MS PGothic (P = proportional spacing)", idSuffix: "ms-pgothic" },
+  { value: "Yu Gothic", label: "Yu Gothic", idSuffix: "yu-gothic" },
+  { value: "Yu Gothic UI", label: "Yu Gothic UI", idSuffix: "yu-gothic-ui" }
+]
+
 const fontTableExternalJa = [
   ...fontTableUniversal,
   { value: "Noto Sans JP", label: "Noto Sans JP", idSuffix: "noto-sans-jp" }
@@ -38,7 +46,7 @@ export const Japanese = () => {
     iso639_3Table={iso639_3TableJa}
     regionTable={regionTableJa}
     fontTableApple={fontTableAppleJa}
-    fontTableWindows={[]}
+    fontTableWindows={fontTableWindowsJa}
     fontTableExternal={fontTableExternalJa}
     languageID="japanese"
   >

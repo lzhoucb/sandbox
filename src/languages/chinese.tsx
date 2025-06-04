@@ -42,12 +42,9 @@ const fontTableAppleZh = [
 
 export const fontTableWindowsZh = [
   ...fontTableUniversal,
-  { value: "KaiTi", label: "KaiTi ('kai' as in 'regular/official/formal'; simplified)", idSuffix: "kaiti" },
-  { value: "DFKai-SB", label: "DFKai-SB (traditional)", idSuffix: "dfkai-sb" },
   { value: "SimSun", label: "SimSun ('Songti'/Song dynasty woodblock; simplified)", idSuffix: "simsun" },
-  { value: "FangSong", label: "FangSong ('pseudo-Songti'; simplified)", idSuffix: "fangsong" },
-  { value: "SimHei", label: "SimHei ('hei' as in 'black/dark'; sans-serif; simplified)", idSuffix: "simhei" },
-  { value: "MingLiU", label: "MingLiU (Ming dynasty serif style; traditional)", idSuffix: "mingliu" }
+  { value: "Microsoft YaHei", label: "Microsoft YaHei (heiti; simplified)", idSuffix: "yahei" },
+  { value: "Microsoft JhengHei", label: "Microsoft JhengHei (heiti; traditional)", idSuffix: "jhenghei" },
 ];
 
 const fontTableExternalZh = [
