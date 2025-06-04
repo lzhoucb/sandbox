@@ -7,11 +7,15 @@ interface RadioProps {
   id: string;
   curValue: string;
   setValue: (value: string) => void;
+  direction: "VERTICAL" | "HORIZONTAL";
 }
 
-const Radio: React.FC<RadioProps> = ({ value, label, name, id, curValue, setValue }) => {
+const Radio: React.FC<RadioProps> = ({ value, label, name, id, curValue, setValue, direction }) => {
+  let display = "";
+  if (direction === "VERTICAL") display = "block";
+  if (direction === "HORIZONTAL") display = "inline-block";
   return (
-    <>
+    <div className="radio-option" style={{ display }}>
       <input
         type="radio"
         checked={curValue === value}
@@ -25,26 +29,32 @@ const Radio: React.FC<RadioProps> = ({ value, label, name, id, curValue, setValu
         }}
       />
       <label htmlFor={id}>{label}</label>
-    </>
+    </div>
   );
 };
 
-interface RadioGroupProps{
-  name: string;
-  curValue: string;
-  setValue: (value: string)=>void;
-  table: Array<{value: string, label: string, idSuffix: string}>;
+export interface RadioGroupRow {
+  value: string;
+  label: string;
+  idSuffix: string;
 }
 
-export const RadioGroup: React.FC<RadioGroupProps> = ({name, curValue, setValue, table}) => {
+interface RadioGroupProps {
+  name: string;
+  curValue: string;
+  setValue: (value: string) => void;
+  table: RadioGroupRow[];
+  direction?: "VERTICAL" | "HORIZONTAL"
+}
+
+export const RadioGroup: React.FC<RadioGroupProps> = ({ name, curValue, setValue, table, direction = "VERTICAL" }) => {
   const radios = [];
 
-  for(const {value, label, idSuffix} of table){
+  for (const { value, label, idSuffix } of table) {
     const id = `${name}-${idSuffix}`;
-    radios.push(<>
-      <Radio key={id} value={value} label={label} name={name} id={id} curValue={curValue} setValue={setValue}/>
-      <br/>
-    </>);
+    radios.push(
+      <Radio key={id} value={value} label={label} name={name} id={id} curValue={curValue} setValue={setValue} direction={direction} />
+    );
   }
 
   return <div className="radio-group">

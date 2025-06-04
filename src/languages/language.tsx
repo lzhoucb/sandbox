@@ -14,12 +14,13 @@ const Language = () => {
       curValue={language}
       setValue={setLanguage}
       table={[
-        {value: "chinese", label: "Chinese", idSuffix: "chinese"},
-        {value: "japanese", label: "Japanese", idSuffix: "japanese"}
+        { value: "chinese", label: "Chinese", idSuffix: "chinese" },
+        { value: "japanese", label: "Japanese", idSuffix: "japanese" }
       ]}
+      direction="HORIZONTAL"
     />
-    {language === "chinese" && <Chinese/>}
-    {language === "japanese" && <Japanese/>}
+    {language === "chinese" && <Chinese />}
+    {language === "japanese" && <Japanese />}
   </>
 }
 
