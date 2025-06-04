@@ -39,9 +39,7 @@ input[type="radio"] {
 }
 
 #trad-chinese,
-#simp-chinese,
-#kanji,
-#hiragana {
+#simp-chinese {
   display: inline-block;
   padding-right: 32px;
 }

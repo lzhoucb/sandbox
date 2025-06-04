@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { RadioGroup, RadioGroupRow } from "../radio";
 
+export const fontTableUniversal = [
+  { value: "", label: "none (empty string)", idSuffix: "none" },
+  { value: "Times", label: "Times", idSuffix: "times" },
+  { value: "Arial", label: "Arial", idSuffix: "arial" }
+];
+
 interface LanguageDisplayProps {
   iso639_1Table: RadioGroupRow[];
   iso639_3Table: RadioGroupRow[];
@@ -108,7 +114,7 @@ export const LanguageDisplay: React.FC<LanguageDisplayProps> = ({
       <div className="language-sample"
         id={languageID}
         lang={compositeLang}
-        style={{ fontFamily: font === "" ? serif : `${font}, ${serif}` }}
+        style={{ fontFamily: compositeFont }}
       >
         {children}
       </div>
@@ -116,4 +122,4 @@ export const LanguageDisplay: React.FC<LanguageDisplayProps> = ({
       <p>lang: {compositeLang || "none (empty string)"}</p>
     </div>
   </>
-}
+};

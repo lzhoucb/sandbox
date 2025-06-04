@@ -1,28 +1,35 @@
 import React from "react";
 import { LanguageDisplay } from "./language-display";
+import { fontTableUniversal } from "./language-display";
 
 //https://pavellaptev.medium.com/japanese-typography-on-the-web-tips-and-tricks-981f120ad20e
 //https://stackoverflow.com/a/14573813
 const iso639_1TableJa = [
   { value: "", label: "none (empty string)", idSuffix: "none" },
   { value: "ja", label: "ja (Japanese)", idSuffix: "ja" },
-]
+];
 
 const iso639_3TableJa = [
   { value: "jpn", label: "jpn (Japanese)", idSuffix: "zho" },
-]
+];
 
 const regionTableJa = [
   { value: "", label: "none (empty string)", idSuffix: "none" },
   { value: "JP", label: "JP (Japan)", idSuffix: "jp" }
-]
+];
 
-const fontTableJa = [
-  { value: "", label: "none (empty string)", idSuffix: "none" },
-  { value: "Times", label: "Times", idSuffix: "times" },
-  { value: "Hiragino", label: "Hiragino (macOS, iOS)", idSuffix: "hiragino" },
-  { value: "Meiryo", label: "Meiryo (Windows)", idSuffix: "meiryo" },
-  { value: "Noto Sans SC", label: "Noto Sans SC", idSuffix: "noto-sans-sc" }
+const fontTableAppleJa = [
+  ...fontTableUniversal,
+  { value: "Hiragino Maru Gothic ProN", label: "Hiragino Maru Gothic ProN (Gothic = sans-serif)", idSuffix: "hiragino-maru" },
+  { value: "Hiragino Mincho ProN", label: "Hiragino Mincho ProN ('Mincho' = Ming dynasty serif typography)", idSuffix: "hiragino-mincho" },
+  { value: "Hiragino Sans", label: "Hiragino Sans", idSuffix: "hiragino-sans" },
+  { value: "YuGothic", label: "YuGothic", idSuffix: "yugothic" },
+  { value: "YuMincho", label: "YuMincho", idSuffix: "yumincho" }
+];
+
+const fontTableExternalJa = [
+  ...fontTableUniversal,
+  { value: "Noto Sans JP", label: "Noto Sans JP", idSuffix: "noto-sans-jp" }
 ]
 
 export const Japanese = () => {
@@ -30,22 +37,18 @@ export const Japanese = () => {
     iso639_1Table={iso639_1TableJa}
     iso639_3Table={iso639_3TableJa}
     regionTable={regionTableJa}
-    fontTableApple={fontTableJa}
+    fontTableApple={fontTableAppleJa}
     fontTableWindows={[]}
-    fontTableExternal={[]}
+    fontTableExternal={fontTableExternalJa}
     languageID="japanese"
   >
-    <div id="kanji">
-      <p>Kanji</p>
-      <p>
-        古池や蛙飛び込む水の音
-      </p>
-    </div>
-    <div id="hiragana">
-      <p>Hiragana</p>
-      <p>
-        ふるいけやかわずとびこむみずのおと
-      </p>
-    </div>
+    <p>Kanji</p>
+    <p>
+      古池や蛙飛び込む水の音
+    </p>
+    <p>Hiragana</p>
+    <p>
+      ふるいけやかわずとびこむみずのおと
+    </p>
   </LanguageDisplay>
 };

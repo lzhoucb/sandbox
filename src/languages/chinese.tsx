@@ -1,5 +1,5 @@
 import React from "react";
-import { LanguageDisplay } from "./language-display";
+import { fontTableUniversal, LanguageDisplay } from "./language-display";
 
 //https://www.mslmaster.com/index.php/teaching-learning-resources?view=article&id=129&catid=10
 //https://fonts.google.com/knowledge/type_in_china_japan_and_korea/type_classification_in_cjk_chinese
@@ -25,12 +25,6 @@ const regionTableZh = [
   { value: "TW", label: "TW (Taiwan)", idSuffix: "tw" }
 ]
 
-const fontTableUniversal = [
-  { value: "", label: "none (empty string)", idSuffix: "none" },
-  { value: "Times", label: "Times", idSuffix: "times" },
-  { value: "Arial", label: "Arial", idSuffix: "arial" }
-];
-
 const fontTableAppleZh = [
   ...fontTableUniversal,
   { value: "Kai", label: "Kai ('kai' as in 'regular/official/formal'; simplified)", idSuffix: "kai" },
@@ -46,7 +40,7 @@ const fontTableAppleZh = [
   { value: "Heiti TC", label: "Heiti TC (traditional)", idSuffix: "heiti-tc" }
 ];
 
-const fontTableWindowsZh = [
+export const fontTableWindowsZh = [
   ...fontTableUniversal,
   { value: "KaiTi", label: "KaiTi ('kai' as in 'regular/official/formal'; simplified)", idSuffix: "kaiti" },
   { value: "DFKai-SB", label: "DFKai-SB (traditional)", idSuffix: "dfkai-sb" },
@@ -54,7 +48,7 @@ const fontTableWindowsZh = [
   { value: "FangSong", label: "FangSong ('pseudo-Songti'; simplified)", idSuffix: "fangsong" },
   { value: "SimHei", label: "SimHei ('hei' as in 'black/dark'; sans-serif; simplified)", idSuffix: "simhei" },
   { value: "MingLiU", label: "MingLiU (Ming dynasty serif style; traditional)", idSuffix: "mingliu" }
-]
+];
 
 const fontTableExternalZh = [
   ...fontTableUniversal,
