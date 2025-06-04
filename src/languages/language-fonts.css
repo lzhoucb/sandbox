@@ -22,6 +22,7 @@ input[type="radio"] {
 
 .language-config{
   display: inline-block;
+  width: 500px;
 }
 
 .language-sample{

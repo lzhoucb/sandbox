@@ -5,6 +5,7 @@ interface LanguageDisplayProps {
   iso639_1Table: RadioGroupRow[];
   iso639_3Table: RadioGroupRow[];
   fontTableApple: RadioGroupRow[];
+  fontTableWindows: RadioGroupRow[];
   fontTableExternal: RadioGroupRow[];
   languageID: string;
   children: React.ReactNode;
@@ -14,6 +15,7 @@ export const LanguageDisplay: React.FC<LanguageDisplayProps> = ({
   iso639_1Table,
   iso639_3Table,
   fontTableApple,
+  fontTableWindows,
   fontTableExternal,
   children,
   languageID
@@ -48,7 +50,6 @@ export const LanguageDisplay: React.FC<LanguageDisplayProps> = ({
         table={[
           { value: "apple", label: "macOS/iOS", idSuffix: "apple" },
           { value: "windows", label: "Windows", idSuffix: "windows" },
-          { value: "chrome", label: "ChromeOS", idSuffix: "chrome" },
           { value: "external", label: "External", idSuffix: "external" }
         ]}
         direction="HORIZONTAL"
@@ -59,6 +60,12 @@ export const LanguageDisplay: React.FC<LanguageDisplayProps> = ({
         curValue={font}
         setValue={setFont}
         table={fontTableApple}
+      />}
+      {fontCategory === "windows" && <RadioGroup
+        name="font-windows"
+        curValue={font}
+        setValue={setFont}
+        table={fontTableWindows}
       />}
       {fontCategory === "external" && <RadioGroup
         name="font-external"

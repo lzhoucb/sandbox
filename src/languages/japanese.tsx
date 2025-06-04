@@ -26,6 +26,7 @@ export const Japanese = () => {
     iso639_1Table={iso639_1TableJa}
     iso639_3Table={iso639_3TableJa}
     fontTableApple={fontTableJa}
+    fontTableWindows={[]}
     fontTableExternal={[]}
     languageID="japanese"
   >

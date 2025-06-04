@@ -36,8 +36,18 @@ const fontTableAppleZh = [
   { value: "Songti TC", label: "Songti TC (traditional)", idSuffix: "songti-tc" },
   { value: "STSong", label: "STSong (simplified)", idSuffix: "stsong" },
   { value: "STFangsong", label: "STFangsong ('pseudo-Songti'; simplified)", idSuffix: "stfangsong" },
-  { value: "Hei", label: "Hei ('hei' as in 'black/dark'; simplified)", idSuffix: "hei" },
+  { value: "Hei", label: "Hei ('hei' as in 'black/dark'; sans-serif; simplified)", idSuffix: "hei" },
   { value: "Heiti SC", label: "Heiti SC (simplified)", idSuffix: "heiti-sc" },
+];
+
+const fontTableWindowsZh = [
+  ...fontTableUniversal,
+  { value: "KaiTi", label: "KaiTi ('kai' as in 'regular/official/formal'; simplified)", idSuffix: "kaiti" },
+  { value: "DFKai-SB", label: "DFKai-SB (traditional)", idSuffix: "dfkai-sb" },
+  { value: "SimSun", label: "SimSun ('Songti'/Song dynasty woodblock; simplified)", idSuffix: "simsun" },
+  { value: "FangSong", label: "FangSong ('pseudo-Songti'; simplified)", idSuffix: "fangsong" },
+  { value: "SimHei", label: "SimHei ('hei' as in 'black/dark'; sans-serif; simplified)", idSuffix: "simhei" },
+  { value: "MingLiU", label: "MingLiU (Ming dynasty serif style; traditional)", idSuffix: "mingliu" }
 ]
 
 const fontTableExternalZh = [
@@ -51,6 +61,7 @@ export const Chinese = () => {
     iso639_1Table={iso639_1TableZh}
     iso639_3Table={iso639_3TableZh}
     fontTableApple={fontTableAppleZh}
+    fontTableWindows={fontTableWindowsZh}
     fontTableExternal={fontTableExternalZh}
     languageID="chinese"
   >
