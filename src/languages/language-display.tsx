@@ -4,6 +4,7 @@ import { RadioGroup, RadioGroupRow } from "../radio";
 interface LanguageDisplayProps {
   iso639_1Table: RadioGroupRow[];
   iso639_3Table: RadioGroupRow[];
+  regionTable: RadioGroupRow[];
   fontTableApple: RadioGroupRow[];
   fontTableWindows: RadioGroupRow[];
   fontTableExternal: RadioGroupRow[];
@@ -14,6 +15,7 @@ interface LanguageDisplayProps {
 export const LanguageDisplay: React.FC<LanguageDisplayProps> = ({
   iso639_1Table,
   iso639_3Table,
+  regionTable,
   fontTableApple,
   fontTableWindows,
   fontTableExternal,
@@ -21,26 +23,43 @@ export const LanguageDisplay: React.FC<LanguageDisplayProps> = ({
   languageID
 }) => {
   const [lang, setLang] = useState("");
+  const [region, setRegion] = useState("");
   const [fontCategory, setFontCategory] = useState("apple");
   const [font, setFont] = useState("");
-  const [serif, setSerif] = useState("serif");
+  const [serif, setSerif] = useState("");
+
+  let compositeFont = "";
+  if (font && !serif) compositeFont = `"${font}"`;
+  else if (!font && serif) compositeFont = serif;
+  else if (font && serif) compositeFont = `"${font}", ${serif}`
+
+  let compositeLang = "";
+  if (lang && !region) compositeLang = lang;
+  else if (!lang && region) compositeLang = "";
+  else if (lang && region) compositeLang = `${lang}-${region}`;
 
   return <>
     <div className="language-config">
-
-      <p>ISO 639-1 lang values</p>
+      <p>ISO 639-1 language values</p>
       <RadioGroup
         name="lang"
         curValue={lang}
         setValue={setLang}
         table={iso639_1Table}
       />
-      <p>ISO 639-3 lang values</p>
+      <p>ISO 639-3 language values</p>
       <RadioGroup
         name="lang"
         curValue={lang}
         setValue={setLang}
         table={iso639_3Table}
+      />
+      <p>region</p>
+      <RadioGroup
+        name="region"
+        curValue={region}
+        setValue={setRegion}
+        table={regionTable}
       />
       <p>font category</p>
       <RadioGroup
@@ -79,13 +98,22 @@ export const LanguageDisplay: React.FC<LanguageDisplayProps> = ({
         curValue={serif}
         setValue={setSerif}
         table={[
+          { value: "", label: "none (empty string)", idSuffix: "none" },
           { value: "serif", label: "serif", idSuffix: "serif" },
           { value: "sans-serif", label: "sans-serif", idSuffix: "sans-serif" }
         ]}
       />
     </div>
-    <div className="language-sample" id={languageID} lang={lang} style={{ fontFamily: font === "" ? serif : `${font}, ${serif}` }}>
-      {children}
+    <div className="language-sample-container">
+      <div className="language-sample"
+        id={languageID}
+        lang={compositeLang}
+        style={{ fontFamily: font === "" ? serif : `${font}, ${serif}` }}
+      >
+        {children}
+      </div>
+      <p>font-family (not necessarily the rendered font): {compositeFont || "none (empty string)"}</p>
+      <p>lang: {compositeLang || "none (empty string)"}</p>
     </div>
   </>
 }

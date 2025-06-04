@@ -25,9 +25,13 @@ input[type="radio"] {
   width: 500px;
 }
 
-.language-sample{
+.language-sample-container {
   display: inline-block;
   vertical-align: top;
+}
+
+.language-sample{
+  padding-bottom: 16px;
 }
 
 .language-sample *{

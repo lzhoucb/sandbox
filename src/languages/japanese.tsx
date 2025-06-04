@@ -10,7 +10,11 @@ const iso639_1TableJa = [
 
 const iso639_3TableJa = [
   { value: "jpn", label: "jpn (Japanese)", idSuffix: "zho" },
-  { value: "jpn-JP", label: "jpn-JP (Japanese, Japan)", idSuffix: "jpn-jp" }
+]
+
+const regionTableJa = [
+  { value: "", label: "none (empty string)", idSuffix: "none" },
+  { value: "JP", label: "JP (Japan)", idSuffix: "jp" }
 ]
 
 const fontTableJa = [
@@ -25,6 +29,7 @@ export const Japanese = () => {
   return <LanguageDisplay
     iso639_1Table={iso639_1TableJa}
     iso639_3Table={iso639_3TableJa}
+    regionTable={regionTableJa}
     fontTableApple={fontTableJa}
     fontTableWindows={[]}
     fontTableExternal={[]}
