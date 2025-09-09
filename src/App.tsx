@@ -1,9 +1,8 @@
 import React from "react";
 import "./App.css";
-import Language from "./languages/language";
-import { ArrayMutator } from "./array-mutator";
+import { AvailableVoices } from "./available-voices";
 
-const App = () => <ArrayMutator />
+const App = () => <AvailableVoices />
 
 
 export default App;
