@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { RadioGroup } from "./radio";
 
-const synth = window.speechSynthesis;
-
 export const AvailableVoices = () => {
-  const [voices, setVoices] = useState(synth.getVoices());
+  const [voices, setVoices] = useState([]);
   const [language, setLanguage] = useState("fr");
+  const [name, setName] = useState("");
 
   useEffect(() => {
+    const synth = window.speechSynthesis;
+
     const handleVoicesChanged = () => {
       setVoices(synth.getVoices());
     }
@@ -16,13 +17,23 @@ export const AvailableVoices = () => {
     return () => synth.removeEventListener("voiceschanged", handleVoicesChanged);
   }, []);
 
+  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setName(event.target.value);
+  }
+
+  const voiceFilter = (voice: SpeechSynthesisVoice) => {
+    return voice.lang.split("-")[0] === language && voice.name.toLowerCase().startsWith(name.toLowerCase());
+  }
+
   const voiceList = voices
-    .filter(voice => voice.lang.split("-")[0] === language)
+    .filter(voiceFilter)
     .sort((a, b) => a.lang.localeCompare(b.lang))
     .map((voice, index) => <Voice voice={voice} key={index} />);
 
+
   return (
     <>
+      <h1>Language</h1>
       <RadioGroup
         name="language"
         curValue={language}
@@ -37,6 +48,7 @@ export const AvailableVoices = () => {
           { value: "ja", label: "ja", idSuffix: "ja" }
         ]}
       />
+      <input type="text" onChange={onNameChange}></input>
       {voiceList}
     </>
   );
@@ -56,6 +68,7 @@ const Voice = ({ voice }) => {
   const language = voice.lang.split("-")[0];
 
   const onPlay = () => {
+    const synth = window.speechSynthesis;
     synth.cancel();
     const utterance = new SpeechSynthesisUtterance(languageToSentence.get(language));
     utterance.voice = voice;
